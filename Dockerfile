@@ -1,5 +1,12 @@
 FROM alpine:latest
 
+LABEL org.opencontainers.image.source="https://github.com/anujdatar/cloudflare-ddns-docker"
+LABEL org.opencontainers.image.description="Cloudflare DynDNS Updater"
+LABEL org.opencontainers.image.author="Anuj Datar <anuj.datar@gmail.com>"
+LABEL org.opencontainers.image.url="https://github.com/anujdatar/cloudflare-ddns-docker/blob/main/README.md"
+LABEL org.opencontainers.image.licenses=MIT
+LABEL org.opencontainers.image.version=23.02
+
 # default env variables
 ENV FREQUENCY 5
 ENV METHOD ZONE
