@@ -1,6 +1,7 @@
 #!/bin/sh
 
 . /cloudflare-init.sh
+. /ddns-update.sh
 
 # add cloudflare-ddns start script to crontab
 echo "*/${FREQUENCY} * * * * /ddns-update.sh" > /crontab.txt
