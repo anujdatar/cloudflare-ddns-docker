@@ -33,19 +33,14 @@ jobs:
           flavor: |
             latest=true
 
-      - name: Setup build dependencies
-        run: docker run --privileged --rm tonistiigi/binfmt --install all
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v2
 
-      - name: Add buildx environment
-        id: builder
-        run: |
-          docker buildx create --name cddnsbuild
-          docker buildx use cddnsbuild
-          docker buildx inspect ----bootstrap
-          docker buildx ls
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
       - name: Build and push images
-        run: docker buildx build
+        uses: docker/build-push-action@v4
         with:
           context: ./
           file: ./Dockerfile
