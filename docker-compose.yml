@@ -1,0 +1,22 @@
+version: "3"
+services:
+  cloudflare-ddns:
+    image: anujdatar/cloudflare-ddns
+    container_name: cloudflare-ddns
+    restart: unless-stopped
+    environment:
+      - API_KEY_FILE=/run/secrets/api_key
+      - ZONE_FILE=/run/secrets/zone
+      - SUBDOMAIN_FILE=/run/secrets/subdomain
+    secrets:
+      - api_key
+      - zone
+      - subdomain
+
+secrets:
+  api_key:
+    file: cloudflare-api-key.txt
+  zone:
+    file: cloudflare-zone.txt
+  subdomain:
+    file: cloudflare-subdomain.txt
