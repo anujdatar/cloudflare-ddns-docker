@@ -45,7 +45,7 @@ jobs:
           docker buildx ls
 
       - name: Build and push images
-        uses: builder
+        run: docker buildx build
         with:
           context: ./
           file: ./Dockerfile
