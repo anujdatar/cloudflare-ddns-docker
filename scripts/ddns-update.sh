@@ -16,6 +16,7 @@ if [ -z $CURRENT_IP ]; then
     echo -s "No public IP found: check internet connection or network settings"
     exit 1
 fi
+echo "Current time: [$(date)]"
 echo "Current Public IP: $CURRENT_IP"
 # #####################################################################
 
