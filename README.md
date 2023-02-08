@@ -62,7 +62,7 @@ services:
     restart: unless-stopped
     environment:
       - API_KEY="<your-scoped-api-token>"
-      - ZONE="<your-dns-zone>" 
+      - ZONE="<your-dns-zone>"
       - SUBDOMAIN="<subdomain-a-record>"
       - FREQUENCY=1  # OPTIONAL, default is 5
 
@@ -122,3 +122,6 @@ To create a scoped token with only DNS privileges, go to https://dash.cloudflare
 3. Zone - DNS - Edit
 
 You may choose to include all zones on one specific zone based on your preferences.
+
+## Todo:
+Add 1pv6 support
