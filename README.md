@@ -1,10 +1,10 @@
 # Cloudflare DynDNS Updater in a docker
 
-Update IP on Cloudflare periodically. Works with docker secrets. Tested on `amd64`, `armv7` and `arm64`
+Update IP on Cloudflare periodically. Works with docker secrets. Built for `amd64`, `arm64` and `armv7`, but only tested on `amd64`, and `arm64`.
 
-Uses Alpine Linux for a minimal footprint, alpine:3.12 to be precise to make sure the same base is compatible for all platforms. alpine versions 3.13+ have issues with `armv7`.
+Now using alpine:latest image for a small footprint. I know alpine:3.13 had an issue with `armv7`. Have not tested latest image on `armv7`. If you have issues, let me know. Will revert to alpine:3.12.
 
-
+Now supports IPv6 or AAAA record updates too, but this needs additional settings. Please read [section](#using-ipv6) below.
 ---
 
 ## Parameters / Environment Variables
@@ -12,27 +12,29 @@ Uses Alpine Linux for a minimal footprint, alpine:3.12 to be precise to make sur
 | - | --------- | ------- | ----- | ----------- |
 | 1 | API_KEY | - | REQUIRED | Your Cloudflare API Key/Token. Global or Zone (scoped) |
 | 2 | EMAIL | - | OPTIONAL | Registered email on Cloudflare, REQUIRED if using METHOD=GLOBAL |
-| 3 | ZONE | - | REQUIRED | The root DNS zone/domain registered on Cloudflare |
-| 4 | SUBDOMAIN | - | OPTIONAL | The DNS subdomain/A-record you want to update. Root Zone is used if nothing is provided |
-| 5 | ZONE_ID | - | OPTIONAL | The Zone ID for domain registered on Cloudflare. Will be fetched from Cloudflare if nothing is provided |
-| 6 | FREQUENCY | 5 | OPTIONAL | Frequency of IP updates on Cloudflare (default - every 5 mins) |
-| 7 | METHOD | ZONE | OPTIONAL | Authentication method - Zone API Token or Global API Token (ZONE or GLOBAL). Global method also required EMAIL |
-| 8 | PROXIED | - | OPTIONAL | true/false boolean, whether record should use Cloudflare CDN. Uses Cloudflare preset for record if nothing is explicitly provided |
+| 3 | RECORD_TYPE | A | OPTIONAL | Record types supported A (IPv4) and AAAA (IPv6) |
+| 4 | ZONE | - | REQUIRED | The root DNS zone/domain registered on Cloudflare |
+| 5 | SUBDOMAIN | - | OPTIONAL | The DNS subdomain/A-record you want to update. Root Zone is used if nothing is provided |
+| 6 | ZONE_ID | - | OPTIONAL | The Zone ID for domain registered on Cloudflare. Will be fetched from Cloudflare if nothing is provided |
+| 7 | FREQUENCY | 5 | OPTIONAL | Frequency of IP updates on Cloudflare (default - every 5 mins) |
+| 8 | METHOD | ZONE | OPTIONAL | Authentication method - Zone API Token or Global API Token (ZONE or GLOBAL). Global method also required EMAIL |
+| 9 | PROXIED | - | OPTIONAL | true/false boolean, whether record should use Cloudflare CDN. Uses Cloudflare preset for record if nothing is explicitly provided |
 
 #### Multiple subdomains
-In order to update multiple DNS records with your dynamic IP, please create `CNAME` records and point them to the `A` record used in this container.
+In order to update multiple DNS records with your dynamic IP, please create `CNAME` records and point them to the `A` or `AAAA` record used in this container.
 
 ---
 
 ## USAGE
 
 ### Docker cli
-**Recommended** method is using a scoped API token. Limits the privileges given to the container.
+**Recommended** method is using a scoped API token (zone). Limits the privileges given to the container.
 ```bash
 docker run \
     -e API_KEY="<your-scoped-api-token>" \
     -e ZONE="<your-dns-zone>"  \
     -e SUBDOMAIN="<subdomain-a-record>" \
+    -e RECORD_TYPE=A \
     --name cloudflare-ddns \
     anujdatar/cloudflare-ddns
 
