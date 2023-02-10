@@ -32,7 +32,7 @@ if [ -f "$SUBDOMAIN_FILE" ]; then
     SUBDOMAIN=$(cat "$SUBDOMAIN_FILE")
 fi
 if [ -z "$SUBDOMAIN" ]; then
-    echo "No Subdomain/A-Record provided"
+    echo "No Subdomain/Record name provided"
     echo "Using DDNS updater on root zone $ZONE"
 else
     echo "Subdomain: $SUBDOMAIN  ---  OK"
@@ -41,7 +41,17 @@ fi
 RECORD_NAME=$([ ! -z "$SUBDOMAIN" ] && echo "$SUBDOMAIN.$ZONE" || echo "$ZONE")
 echo "Using DDNS updater on record: $RECORD_NAME"
 
-# 4. Email - only needed if Global API key is used
+# 4. Record Type
+if [ "$RECORD_TYPE" == "A" ]; then
+    echo "Record type to be updated: A (IPv4)"
+elif [ "$RECORD_TYPE" == "AAAA" ]; then
+    echo "Record type to be updated: AAAA (IPv6)"
+else
+    RECORD_TYPE="A"
+    echo "Unknown record type, assuming A-record (IPv4)"
+fi
+
+# 5. Email - only needed if Global API key is used
 if [ -f "$EMAIL_FILE" ]; then
     EMAIL=$(cat "$EMAIL_FILE")
 fi
@@ -49,7 +59,7 @@ if [ ! -z "EMAIL" ]; then
     echo "Email: $EMAIL  ---  OK"
 fi
 
-# 5. ZoneID - optional, will be fetched later if not provided
+# 6. ZoneID - optional, will be fetched later if not provided
 if [ -f "$ZONE_ID_FILE" ]; then
     ZONE_ID=$(cat "$ZONE_ID_FILE")
     if [ ! -z "ZONE_ID" ]; then
@@ -57,7 +67,7 @@ if [ -f "$ZONE_ID_FILE" ]; then
     fi
 fi
 
-# 6. auth method check
+# 7. auth method check
 if [ "$METHOD" == "GLOBAL" ] && [ -z "$EMAIL" ]; then
     echo "Please enter valid EMAIL env variable or EMAIL_FILE secret if using global api key"
     echo "Recommended method: Use a scoped API_KEY"
@@ -86,7 +96,6 @@ fi
 echo "  ---  OK"
 # #####################################################################
 
-
 # #####################################################################
 # Step 3: Get Cloudflare ZoneID if not defined as env variable
 print_breaker
@@ -102,15 +111,13 @@ fi
 echo "Zone ID: $ZONE_ID for $ZONE  ---  OK"
 # #####################################################################
 
-
 # #####################################################################
 # Step 4: Get Cloudflare dns record details
 print_breaker
 echo -n "Fetching DNS Record details for $RECORD_NAME"
-details=$(api_request "$ENDPOINT/zones/$ZONE_ID/dns_records?type="A"&name=$RECORD_NAME")
+details=$(api_request "$ENDPOINT/zones/$ZONE_ID/dns_records?type=$RECORD_TYPE&name=$RECORD_NAME")
 echo "  ---  Done"
 # #####################################################################
-
 
 # #####################################################################
 # Step 5: Verify record details are valid
@@ -140,7 +147,6 @@ if [ -z "$PROXIED" ]; then
 fi
 # #####################################################################
 
-
 # #####################################################################
 # Step 6: Save relevant details in files
 print_breaker
@@ -152,6 +158,7 @@ echo "$RECORD_IP" > /old_record_ip
 # store zone_id, record_name, record_id in config
 echo "ZONE_ID=\"$ZONE_ID\"" > /config.sh
 echo "RECORD_NAME=\"$RECORD_NAME\"" >> /config.sh
+echo "RECORD_TYPE=\"$RECORD_TYPE\"" >> /config.sh
 echo "RECORD_ID=\"$RECORD_ID\"" >> /config.sh
 echo "PROXIED=\"$PROXIED\"" >> /config.sh
 # #####################################################################
