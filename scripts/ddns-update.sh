@@ -45,7 +45,7 @@ if [ "$OLD_IP" == "$CURRENT_IP" ]; then
 else
 	echo "Updating cloudflare record with current public ip"
 	update=$(api_request -X PUT "$ENDPOINT/zones/$ZONE_ID/dns_records/$RECORD_ID" \
-					--data "{\"type\":\"A\",\"name\":\"$RECORD_NAME\",\"content\":\"$CURRENT_IP\",\"proxied\":$PROXIED}")
+					--data "{\"type\":\"$RECORD_TYPE\",\"name\":\"$RECORD_NAME\",\"content\":\"$CURRENT_IP\",\"proxied\":$PROXIED}")
 
 	if [ $(echo $update | jq -r '.result.id') == "null" ]; then
 		echo "Error updating Cloudflare DNS record $RECORD_NAME"
