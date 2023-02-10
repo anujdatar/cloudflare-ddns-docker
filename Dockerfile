@@ -12,7 +12,7 @@ ENV FREQUENCY 5
 ENV METHOD ZONE
 
 # install dependencies
-RUN apk update && apk add --no-cache curl jq
+RUN apk update && apk add --no-cache curl jq bind-tools
 
 # copy scripts over
 COPY scripts /
