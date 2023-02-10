@@ -5,6 +5,7 @@ Update IP on Cloudflare periodically. Works with docker secrets. Built for `amd6
 Now using alpine:latest image for a small footprint. I know alpine:3.13 had an issue with `armv7`. Have not tested latest image on `armv7`. If you have issues, let me know. Will revert to alpine:3.12.
 
 Now supports IPv6 or AAAA record updates too, but this needs additional settings. Please read [section](#using-ipv6) below.
+
 ---
 
 ## Parameters / Environment Variables
