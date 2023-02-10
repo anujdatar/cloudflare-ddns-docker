@@ -5,15 +5,29 @@
 
 # #####################################################################
 # Step 1: Get current public IP
-CURRENT_IP=$(curl -s https://api.ipify.org || curl -s https://ipv4.icanhazip.com/)
 
-# check cloudflare's dns server if above method doesn't work
-if [ -z $CURRENT_IP ]; then
-    CURRENT_IP=$(dig @1.1.1.1 ch txt whoami.cloudflare +short | tr -d '"')
+echo fetching record type $RECORD_TYPE
+
+if [ "$RECORD_TYPE" == "A" ]; then
+	CURRENT_IP=$(curl -s https://api.ipify.org || curl -s https://ipv4.icanhazip.com/)
+
+	# check cloudflare's dns server if above method doesn't work
+	if [ -z $CURRENT_IP ]; then
+		echo using cloudflare whoami to find ip
+    CURRENT_IP=$(dig txt ch +short whoami.cloudflare @1.1.1.1 | tr -d '"')
+	fi
+elif [ "$RECORD_TYPE" == "AAAA" ]; then
+	CURRENT_IP=$(curl -s https://api6.ipify.org || curl -s https://ipv6.icanhazip.com/)
+
+	# check cloudflare's dns server if above method doesn't work
+	if [ -z $CURRENT_IP ]; then
+		echo using cloudflare whoami to find ip
+    CURRENT_IP=$(dig txt ch +short whoami.cloudflare @2606:4700:4700::1111 | tr -d '"')
+	fi
 fi
 
 if [ -z $CURRENT_IP ]; then
-    echo -s "No public IP found: check internet connection or network settings"
+    echo "No public IP found: check internet connection or network settings"
     exit 1
 fi
 echo "Current time: [$(date)]"
