@@ -68,12 +68,12 @@ fi
 echo "Done - Everything seems to be in order"
 # #####################################################################
 
-
 # #####################################################################
 # Step 2: Verify user email and token is valid
 print_breaker
 echo -n "Validating Cloudflare access tokens"
 if [ "$METHOD" == "GLOBAL" ]; then
+    echo "Using Global API token. It is recommended to use a scoped zone token for additional security"
     token_validity=$(api_request -o /dev/null -w "%{http_code}" "$ENDPOINT/user")
 else
     token_validity=$(api_request -o /dev/null -w "%{http_code}" "$ENDPOINT/user/tokens/verify")
