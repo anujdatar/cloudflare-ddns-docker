@@ -123,7 +123,7 @@ Docker by default only has IPv4 enabled. So containers can only access the web t
 
 First you will have to allow IPv6 internet access to the docker subnet on your Host machine. Assuming the private Docker subnet we assign in the steps below is `fd00::/64`. You can use a different subnet if you wish. Or you may need to use a different subnet if you have multiple docker networks with IPv6 enabled.
 ```bash
-ip6tables -t nat -A POSTROUTING -s fd00::/64 ! -j MASQUERADE
+ip6tables -t nat -A POSTROUTING -s fd00::/64 -j MASQUERADE
 ```
 This setting is not persistent, and will not survive a reboot. To make it persistent
 
