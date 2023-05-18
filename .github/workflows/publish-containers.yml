@@ -29,7 +29,6 @@ jobs:
         with:
           images: ${{ secrets.DOCKER_USER }}/cloudflare-ddns
           tags: |
-            type=semver,pattern={{version}}
             type=raw,value={{date 'YY.MM.DD'}}
           flavor: |
             latest=true
