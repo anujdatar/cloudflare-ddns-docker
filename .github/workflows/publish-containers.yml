@@ -9,10 +9,8 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-    # base container to build on
+  build-for-docker-hub:
     runs-on: ubuntu-latest
-    # sequence of tasks in the build process
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -23,7 +21,7 @@ jobs:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Extract metadata (tags, labels) for Docker
+      - name: Extract metadata (tags, labels) for container image
         id: meta
         uses: docker/metadata-action@v4
         with:
