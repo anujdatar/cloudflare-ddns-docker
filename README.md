@@ -6,6 +6,10 @@ Now using alpine:latest image for a small footprint. I know alpine:3.13 had an i
 
 Now supports IPv6 or AAAA record updates too, but this needs additional settings. Please read [section](#using-ipv6) below.
 
+Container packages available from Docker Hub and Github Container Registry (ghcr.io)
+  - Docker Hub Image: `anujdatar/cloudflare-ddns`
+  - GHCR Image: `ghcr.io/anujdatar/cloudflare-ddns`
+
 ---
 
 ## Parameters / Environment Variables
