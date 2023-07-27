@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. /cloudflare-init.sh
+. /container-setup.sh
 . /ddns-update.sh
 
 # add cloudflare-ddns start script to crontab
