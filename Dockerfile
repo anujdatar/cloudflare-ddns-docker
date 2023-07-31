@@ -13,7 +13,7 @@ ENV RECORD_TYPE A
 ENV ENDPOINT "https://api.cloudflare.com/client/v4"
 
 # install dependencies
-RUN apk update && apk add --no-cache curl bind-tools jq
+RUN apk update && apk add --no-cache tzdata curl bind-tools jq
 
 # copy scripts over
 COPY scripts /
