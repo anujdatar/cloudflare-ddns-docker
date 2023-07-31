@@ -1,7 +1,8 @@
 #!/bin/sh
 
-echo "Container spun up at: [$(date)]"
-. /common.sh
+print_breaker() {
+  echo "-----------------------------------------------"
+}
 
 # #####################################################################
 # Step 1: set up timezone
@@ -89,6 +90,21 @@ echo "Done - Everything seems to be in order"
 # #####################################################################
 # Step 2: Verify user email and token is valid
 print_breaker
+# define the basic api request
+api_request() {
+  if [ "$METHOD" == "GLOBAL" ]; then
+    curl -sSL \
+    -H "Content-Type: application/json" \
+    -H "X-Auth-Email: $EMAIL" \
+    -H "X-Auth-Key: $API_KEY" \
+    "$@"
+  else
+    curl -sSL \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $API_KEY" \
+    "$@"
+  fi
+}
 echo -n "Validating Cloudflare access tokens"
 if [ "$METHOD" == "GLOBAL" ]; then
     echo "Using Global API token. It is recommended to use a scoped zone token for additional security"
