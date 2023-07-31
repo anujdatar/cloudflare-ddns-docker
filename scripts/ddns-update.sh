@@ -1,60 +1,78 @@
 #!/bin/sh
 
-. /common.sh
 . /config.sh
+# #####################################################################
+# define the basic api request
+api_request() {
+	if [ "$METHOD" == "GLOBAL" ]; then
+		curl -sSL \
+		-H "Content-Type: application/json" \
+		-H "X-Auth-Email: $EMAIL" \
+		-H "X-Auth-Key: $API_KEY" \
+		"$@"
+	else
+		curl -sSL \
+		-H "Content-Type: application/json" \
+		-H "Authorization: Bearer $API_KEY" \
+		"$@"
+	fi
+}
+# functions to get public ip
+get_ip4() {
+  CURRENT_IP=$(curl -s https://ipv4.icanhazip.com/ || curl -s https://api.ipify.org)
+  if [ -z $CURRENT_IP ]; then
+    dig_ip=$(dig txt ch +short whoami.cloudflare @1.1.1.1)
+    if [ "$?" = 0 ]; then
+      CURRENT_IP=$(echo $dig_ip | tr -d '"')
+    else
+      exit 1
+    fi
+  fi
+  echo $CURRENT_IP
+}
 
+get_ip6() {
+  CURRENT_IP=$(curl -s https://ipv6.icanhazip.com/ || curl -s https://api6.ipify.org)
+  if [ -z $CURRENT_IP ]; then
+    dig_ip=$(dig txt ch +short whoami.cloudflare @2606:4700:4700::1111)
+    if [ "$?" = 0 ]; then
+      CURRENT_IP=$(echo $dig_ip | tr -d '"')
+    else
+      exit 1
+    fi
+  fi
+  echo $CURRENT_IP
+}
 # #####################################################################
 # Step 1: Get current public IP
-
-echo fetching record type $RECORD_TYPE
-
 if [ "$RECORD_TYPE" == "A" ]; then
-	CURRENT_IP=$(curl -s https://api.ipify.org || curl -s https://ipv4.icanhazip.com/)
-
-	# check cloudflare's dns server if above method doesn't work
-	if [ -z $CURRENT_IP ]; then
-		echo using cloudflare whoami to find ip
-    CURRENT_IP=$(dig txt ch +short whoami.cloudflare @1.1.1.1 | tr -d '"')
-	fi
+	CURRENT_IP=$(get_ip4)
 elif [ "$RECORD_TYPE" == "AAAA" ]; then
-	CURRENT_IP=$(curl -s https://api6.ipify.org || curl -s https://ipv6.icanhazip.com/)
-
-	# check cloudflare's dns server if above method doesn't work
-	if [ -z $CURRENT_IP ]; then
-		echo using cloudflare whoami to find ip
-    CURRENT_IP=$(dig txt ch +short whoami.cloudflare @2606:4700:4700::1111 | tr -d '"')
-	fi
+	CURRENT_IP=$(get_ip6)
 fi
 
 if [ -z $CURRENT_IP ]; then
-    echo "No public IP found: check internet connection or network settings"
-    exit 1
+	echo "[$(date)]: Public IP not found, check internet connection"
+	exit 1
 fi
-echo "Current time: [$(date)]"
-echo "Current Public IP: $CURRENT_IP"
 # #####################################################################
-
-
-# #####################################################################
-# Step 2: Update ddns
-# check registered ip against current public ip
+# Step 2: Check against old IP
 OLD_IP=$(cat /old_record_ip)
-echo "Stored IP address $OLD_IP"
 if [ "$OLD_IP" == "$CURRENT_IP" ]; then
-    echo "IP address is unchanged. Update not required."
-else
-	echo "Updating cloudflare record with current public ip"
-	update=$(api_request -X PUT "$ENDPOINT/zones/$ZONE_ID/dns_records/$RECORD_ID" \
-					--data "{\"type\":\"$RECORD_TYPE\",\"name\":\"$RECORD_NAME\",\"content\":\"$CURRENT_IP\",\"proxied\":$PROXIED}")
-
-	if [ $(echo $update | jq -r '.result.id') == "null" ]; then
-		echo "Error updating Cloudflare DNS record $RECORD_NAME"
-		echo "$update"
-	else
-		echo "DNS Record $RECORD_NAME IP updated to $CURRENT_IP"
-		echo "$CURRENT_IP" > /old_record_ip
-	fi
+  echo "[$(date)]: IP unchanged, not updating. IP: $CURRENT_IP"
+	exit 0
 fi
 # #####################################################################
+# Step 3: Update ddns
+echo "Updating cloudflare record with current public ip"
+update=$(api_request -X PUT "$ENDPOINT/zones/$ZONE_ID/dns_records/$RECORD_ID" \
+				--data "{\"type\":\"$RECORD_TYPE\",\"name\":\"$RECORD_NAME\",\"content\":\"$CURRENT_IP\",\"proxied\":$PROXIED}")
 
-print_breaker
+if [ $(echo $update | jq -r '.result.id') == "null" ]; then
+	echo "[$(date)]: DDNS update failed...  Curr IP: $CURRENT_IP"
+	echo "$update"
+else
+	echo "[$(date)]: DDNS update successful...   IP: $CURRENT_IP"
+	echo "$CURRENT_IP" > /old_record_ip
+fi
+# #####################################################################
