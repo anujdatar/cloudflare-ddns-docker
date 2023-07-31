@@ -66,7 +66,7 @@ fi
 if [ -f "$EMAIL_FILE" ]; then
   EMAIL=$(cat "$EMAIL_FILE")
 fi
-if [ ! -z "EMAIL" ]; then
+if [ ! -z "$EMAIL" ]; then
   echo "Email: $EMAIL  ---  OK"
 fi
 # #####################################################################
@@ -85,7 +85,7 @@ fi
 # Step 8. ZoneID - optional, will be fetched later if not provided
 if [ -f "$ZONE_ID_FILE" ]; then
   ZONE_ID=$(cat "$ZONE_ID_FILE")
-  if [ ! -z "ZONE_ID" ]; then
+  if [ ! -z "$ZONE_ID" ]; then
     echo "Zone ID: $ZONE_ID  ---  OK"
   fi
 fi
