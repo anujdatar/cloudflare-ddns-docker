@@ -4,8 +4,16 @@ echo "Container spun up at: [$(date)]"
 . /common.sh
 
 # #####################################################################
-# Step 1: Check auth secrets and env variables
-# 1. API key
+# Step 1: set up timezone
+if [ -z "$TZ" ]; then
+  echo "TZ environment variable not set. Using default: UTC"
+else
+  echo "Setting timezone to $TZ"
+  ln -snf /usr/share/zoneinfo/$TZ /etc/localtime
+  echo $TZ > /etc/timezone
+fi
+
+echo "Starting Cloudflare DDNS container: [$(date)]"
 print_breaker
 echo "Performing basic container parameter check"
 if [ -f "$API_KEY_FILE" ]; then
