@@ -17,6 +17,6 @@ RUN apk update && apk add --no-cache curl bind-tools jq
 
 # copy scripts over
 COPY scripts /
-RUN chmod 700 /entry.sh /container-setup.sh /common.sh /ddns-update.sh
+RUN chmod 700 /entry.sh /container-setup.sh /ddns-update.sh
 
 CMD ["/entry.sh"]
