@@ -8,8 +8,8 @@ LABEL org.opencontainers.image.licenses=MIT
 
 # default env variables
 ENV FREQUENCY 5
-ENV METHOD ZONE
 ENV RECORD_TYPE A
+ENV METHOD ZONE
 ENV ENDPOINT "https://api.cloudflare.com/client/v4"
 
 # install dependencies
