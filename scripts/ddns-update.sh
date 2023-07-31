@@ -62,19 +62,18 @@ fi
 OLD_IP=$(cat /old_record_ip)
 if [ "$OLD_IP" == "$CURRENT_IP" ]; then
   echo "[$(date)]: IP unchanged, not updating. IP: $CURRENT_IP"
-	exit 0
-fi
 # #####################################################################
 # Step 3: Update ddns
-echo "Updating cloudflare record with current public ip"
-update=$(api_request -X PUT "$ENDPOINT/zones/$ZONE_ID/dns_records/$RECORD_ID" \
-				--data "{\"type\":\"$RECORD_TYPE\",\"name\":\"$RECORD_NAME\",\"content\":\"$CURRENT_IP\",\"proxied\":$PROXIED}")
-
-if [ $(echo $update | jq -r '.result.id') == "null" ]; then
-	echo "[$(date)]: DDNS update failed...  Curr IP: $CURRENT_IP"
-	echo "$update"
 else
-	echo "[$(date)]: DDNS update successful...   IP: $CURRENT_IP"
-	echo "$CURRENT_IP" > /old_record_ip
+  update=$(api_request -X PUT "$ENDPOINT/zones/$ZONE_ID/dns_records/$RECORD_ID" \
+    --data "{\"type\":\"$RECORD_TYPE\",\"name\":\"$RECORD_NAME\",\"content\":\"$CURRENT_IP\",\"proxied\":$PROXIED}")
+
+  if [ $(echo $update | jq -r '.result.id') == "null" ]; then
+    echo "[$(date)]: DDNS update failed...  Curr IP: $CURRENT_IP"
+    echo "$update"
+  else
+    echo "[$(date)]: DDNS update successful...   IP: $CURRENT_IP"
+    echo "$CURRENT_IP" > /old_record_ip
+  fi
 fi
 # #####################################################################
